@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camilan Lokal - Beranda</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header"></header>
+
+  <main class="container">
+
+    <section class="hero hero-modern">
+      <h1>Camilan Lokal</h1>
+      <p>
+        Nikmati aneka camilan lokal pilihan dengan rasa
+        yang lezat dan harga terjangkau.
+      </p>
+      <a href="#katalog" class="btn">Jelajahi Camilan</a>
+    </section>
+
+    <section id="katalog">
+      <h2>Katalog Camilan</h2>
+      <p class="muted">Temukan camilan favoritmu.</p>
+
+      <div class="toolbar">
+        <div class="form-group" style="flex:1">
+          <label for="search">Cari produk</label>
+          <input type="search" id="search"
+            placeholder="Cari nama atau deskripsi produk...">
+        </div>
+
+        <div class="form-group" style="flex:1">
+          <label for="category-filter">Kategori</label>
+          <select id="category-filter">
+            <option value="">Semua kategori</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="product-list" class="product-grid"></div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer"></footer>
+
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/cart.js"></script>
+
+  <script>
+    let catalogProducts = [];
+
+    function renderCategories() {
+      const select = document.getElementById("category-filter");
+      const categories = getAll("category");
+
+      select.innerHTML = `
+        <option value="">Semua kategori</option>
+        ${categories.map(category => `
+          <option value="${category.category_id}">
+            ${escapeHTML(category.category_name)}
+          </option>
+        `).join("")}
+      `;
+    }
+
+    function filterProducts() {
+      const searchText =
+        document.getElementById("search").value.toLowerCase();
+
+      const categoryId =
+        document.getElementById("category-filter").value;
+
+      const filtered = catalogProducts.filter(product => {
+        const name = product.product_name.toLowerCase();
+        const description = product.description.toLowerCase();
+
+        const matchSearch =
+          name.includes(searchText) ||
+          description.includes(searchText);
+
+        const matchCategory = !categoryId ||
+          Number(product.category_id) === Number(categoryId);
+
+        return matchSearch && matchCategory;
+      });
+
+      renderProducts(filtered);
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      await initDB();
+
+      catalogProducts = getAll("product");
+
+      renderCategories();
+      renderProducts(catalogProducts);
+
+      document.getElementById("search")
+        .addEventListener("input", filterProducts);
+
+      document.getElementById("category-filter")
+        .addEventListener("change", filterProducts);
+    });
+  </script>
+
+</body>
+</html>

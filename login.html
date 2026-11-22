@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Camilan Lokal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header"></header>
+
+  <main class="container">
+    <section class="auth-layout">
+      <article class="card">
+        <h1>Login</h1>
+        <p class="muted">Masuk ke Sistem E-Commerce Camilan Lokal.</p>
+
+        <form id="login-form">
+          <div class="form-group">
+            <label for="email">Email <span class="required">*</span></label>
+            <input type="email" id="email" name="email"
+              placeholder="nama@email.com" required>
+            <span class="field-error" id="email-error"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Kata sandi <span class="required">*</span></label>
+            <input type="password" id="password" name="password"
+              minlength="6" placeholder="Masukkan kata sandi" required>
+            <span class="field-error" id="password-error"></span>
+          </div>
+
+          <div id="login-error" class="field-error"></div>
+
+          <button class="btn btn-block" type="submit">
+            Masuk
+          </button>
+        </form>
+
+        <hr>
+
+        <p>
+          Belum memiliki akun?
+          <a href="register.html">Registrasi sekarang</a>
+        </p>
+      </article>
+
+      <article class="card demo-accounts">
+        <h2>Akun Demo</h2>
+        <p class="muted">Gunakan akun berikut untuk pengujian:</p>
+
+        <h3>Admin</h3>
+        <p>Email: admin@example.com</p>
+        <p>Password: admin123</p>
+
+        <h3>Kurir 1</h3>
+        <p>Email: kurir1@example.com</p>
+        <p>Password: kurir123</p>
+
+        <h3>Kurir 2</h3>
+        <p>Email: kurir2@example.com</p>
+        <p>Password: kurir123</p>
+
+        <h3>Pemilik</h3>
+        <p>Email: pemilik@example.com</p>
+        <p>Password: pemilik123</p>
+
+        <h3>Pelanggan Andi</h3>
+        <p>Email: andi@example.com</p>
+        <p>Password: andi123</p>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer"></footer>
+
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+
+  <script>
+    document.getElementById("login-form").addEventListener("submit",
+      async function(event) {
+        event.preventDefault();
+
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const errorBox = document.getElementById("login-error");
+
+        errorBox.textContent = "";
+
+        try {
+          await initDB();
+
+          const result = await loginUser(email, password);
+
+          if (!result.success) {
+            errorBox.textContent = result.message;
+            return;
+          }
+
+          showToast("Login berhasil.");
+
+          redirectByRole(result.user);
+        } catch (error) {
+          errorBox.textContent = error.message;
+        }
+      });
+  </script>
+</body>
+</html>
